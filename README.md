@@ -68,7 +68,3 @@ go test ./...
 ## 📜 License
 
 This project is for assessment purposes only.
-
-## 📧 Contact
-
-For any inquiries, reach out via [your email or contact details].
