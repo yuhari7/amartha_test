@@ -8,15 +8,20 @@ This repository focuses on achieving the objectives of the **Amartha Golang Deve
 
 ```go
 .
-├── domain/        # Domain models
-├── handler/       # HTTP request handlers
-├── repository/    # Data access layer
-├── service/       # Business services
-├── usecase/       # Application use cases
-├── go.sum         # Checksum file ensuring module integrity and security
-├── go.mod         # Go module dependencies
-├── main.go        # Main application entry point
-└── README.md      # Project documentation
+├── internal/           # Business logic and application layers
+│   ├── domain/         # Domain models
+│   │   ├── entities/   # Core entities representing business objects
+│   │   ├── interfaces/ # Interfaces for defining contracts between layers
+│   │   ├── usecase/    # Application use cases implementing business logic
+│   ├── infrastructure/ # Infrastructure-related code (e.g., HTTP handlers, database)
+│   │   ├── delivery/   # HTTP request handlers
+│   │   ├── repository/ # Data access layer interacting with storage
+├── test/               # Unit and integration tests
+├── go.sum              # Checksum file ensuring module integrity and security
+├── go.mod              # Go module dependencies
+├── main.go             # Main application entry point
+└── README.md           # Project documentation
+
 ```
 
 ## 📥 Getting Started
