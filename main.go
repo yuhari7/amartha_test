@@ -2,50 +2,34 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 
-	"github.com/yuhari7/amartha_test/domain"
-	"github.com/yuhari7/amartha_test/repository"
-	"github.com/yuhari7/amartha_test/usecase"
+	"github.com/yuhari7/amartha_test/internal/domain/entities"
+	usecases "github.com/yuhari7/amartha_test/internal/domain/usecases"
+	delivery "github.com/yuhari7/amartha_test/internal/infrastructure/delivery/http"
+	"github.com/yuhari7/amartha_test/internal/infrastructure/repository"
 )
 
 func main() {
-	loanRepo := repository.NewLoanRepository()
+	loanRepo := repository.NewInMemoryLoanRepository()
+	initializeSampleData(loanRepo)
 
-	loan := &domain.Loan{
-		ID:           100,
-		Amount:       5000000,
-		InterestRate: 0.10,
-		Term:         50,
-		Outstanding:  5500000,
-		Borrower:     domain.Borrower{ID: 1, Name: "John Doe"},
-		Schedule:     generateSchedule(110000, 50),
-	}
+	loanService := usecases.LoanService{LoanRepository: loanRepo}
+	loanController := delivery.LoanController{LoanService: loanService}
 
-	loanRepo.UpdateLoan(loan)
+	r := delivery.NewRouter(loanController)
 
-	loanUsecase := usecase.NewLoanUsecase(loanRepo)
-
-	fmt.Println("Loan Billing System")
-
-	outstanding, _ := loanUsecase.GetOutstanding(100)
-	fmt.Printf("Outstanding: %.2f\n", outstanding)
-
-	err := loanUsecase.MakePayment(100, 110000)
-	if err != nil {
-		fmt.Println("Payment error:", err)
-	}
-
-	outstanding, _ = loanUsecase.GetOutstanding(100)
-	fmt.Printf("Outstanding: %.2f\n", outstanding)
-
-	isDelinquent, _ := loanUsecase.IsDelinquent(100)
-	fmt.Printf("Is Delinquent: %v\n", isDelinquent)
+	fmt.Println("Server is running and connected on port 8080")
+	http.ListenAndServe(":8080", r)
 }
 
-func generateSchedule(amount float64, term int) []domain.Payment {
-	schedule := make([]domain.Payment, term)
-	for i := 0; i < term; i++ {
-		schedule[i] = domain.Payment{Week: i + 1, Amount: amount}
-	}
-	return schedule
+func initializeSampleData(loanRepo *repository.InMemoryLoanRepository) {
+	loanRepo.Save(entities.Loan{
+		ID:            100,
+		Amount:        5000000,
+		InterestRate:  10,
+		TermWeeks:     50,
+		WeeklyPayment: 110000,
+		Payments:      []entities.Payment{},
+	})
 }
